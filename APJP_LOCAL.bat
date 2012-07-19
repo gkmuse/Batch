@@ -1,14 +1,16 @@
 @echo off
 cd %~dp0
+if EXIST APJP_LOCAL.tmp goto EOF
 setlocal=EnableDelayedExpansion
 set a=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
 set count=0
-:loop
+:LOOP
 set /a count+=1
 set /a rand=%Random%%%61
 set buffer=!buffer!!a:~%rand%,1!
+:: The maximum RC4 key length is 128 bits
 :: The maximum length of APJP_KEY is 16
-if !count! leq 15 goto loop
+if !count! leq 15 goto LOOP
 echo APJP_KEY=!buffer!
 rename APJP_LOCAL.properties APJP_LOCAL.tmp
 for /f "tokens=*" %%i in (APJP_LOCAL.tmp) do (
@@ -19,5 +21,6 @@ if "!foo!"=="APJP_REMOTE_HTTPS_SERVER_1_REQUEST_URL=" set foo=APJP_REMOTE_HTTPS_
 <nul set /p ".=!foo!" >> APJP_LOCAL.properties
 echo.>> APJP_LOCAL.properties
 )
-del APJP_LOCAL.tmp
-::java -classpath APJP_LOCAL_JAVA-1.0.0.jar APJP.Main
+:EOF
+java -classpath APJP_LOCAL_JAVA-1.0.0.jar APJP.Main
+pause
